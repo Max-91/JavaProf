@@ -8,9 +8,15 @@ package Homework5;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 public class MainClass {
     public static final int CARS_COUNT = 4;
+    public static CountDownLatch cdl1=new CountDownLatch(CARS_COUNT); // Счетчик потоков для старта гонки
+    public static CountDownLatch cdl2=new CountDownLatch(CARS_COUNT); // Счетчик потоков для завершения гонки
+    public static Semaphore smp= new Semaphore(CARS_COUNT/2); // Семафор показывает кол-во потоков которые можно выполнять одновременно, остальные в wait
+    public static boolean wasWin = false;
 
     public static void main(String[] args) {
         System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Подготовка!!!");
@@ -22,8 +28,15 @@ public class MainClass {
         for (int i = 0; i < cars.length; i++) {
             new Thread(cars[i]).start();
         }
-        System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка началась!!!");
-        System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка закончилась!!!");
+        try {
+            cdl1.await();
+            System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка началась!!!");
+            cdl2.await();
+            System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка закончилась!!!");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 }
 
